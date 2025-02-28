@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/deifyed/introvert/features/browser"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -22,8 +23,9 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return nil
+		return browser.Start(args[0])
 	},
 }
 
