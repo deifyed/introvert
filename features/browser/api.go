@@ -14,9 +14,9 @@ func Start(url string) error {
 
 	viewport := container.New(layout.NewVBoxLayout())
 
-	statusbar := NewStatusBar()
-	statusbar.SetAddress(url)
-	viewport.Add(statusbar.CanvasObject())
+	sb := NewStatusBar()
+	sb.SetAddress(url)
+	viewport.Add(sb.CanvasObject())
 
 	main := container.NewHBox()
 
@@ -24,7 +24,10 @@ func Start(url string) error {
 	main.Add(navbar.CanvasObject())
 
 	viewer := NewViewer()
-	main.Add(viewer.CanvasObject())
+
+	viewerScroll := container.NewScroll(viewer.CanvasObject())
+
+	main.Add(viewerScroll)
 
 	viewport.Add(main)
 
@@ -42,9 +45,17 @@ func Start(url string) error {
 		window.SetTitle(page.Title)
 		navbar.SetLinks(page.navigation)
 		viewer.SetSections(page.Sections)
+		viewerScroll.SetMinSize(calculateViewerSize(window, &sb))
 	}()
 
 	window.ShowAndRun()
 
 	return nil
+}
+
+func calculateViewerSize(window fyne.Window, sb *statusbar) fyne.Size {
+	var width float32 = 500
+	var height float32 = window.Canvas().Size().Height - sb.CanvasObject().Size().Height
+
+	return fyne.NewSize(width, height)
 }

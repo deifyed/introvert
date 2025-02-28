@@ -6,10 +6,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var size = fyne.NewSize(400, 0)
-
 func NewViewer() viewer {
-	c := container.NewMax()
+	c := container.NewVBox()
 
 	return viewer{
 		container: c,
@@ -36,10 +34,8 @@ func makeSection(s section) fyne.CanvasObject {
 	wrapper := container.NewVBox()
 
 	for _, p := range s.paragraphs {
-		l := widget.NewMultiLineEntry()
-		l.SetMinRowsVisible(5)
-		l.SetText(p)
-		l.Resize(size)
+		l := widget.NewLabel(p)
+		l.Wrapping = fyne.TextWrapWord
 
 		wrapper.Add(l)
 	}
