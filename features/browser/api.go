@@ -37,7 +37,7 @@ func Start(url string) error {
 	go func() {
 		page, err := parse(strings.NewReader(mockData))
 		if err != nil {
-			app.SendNotification(fyne.NewNotification("error", err.Error()))
+			notify(app, err.Error())
 
 			return
 		}
@@ -48,7 +48,8 @@ func Start(url string) error {
 		viewerScroll.SetMinSize(calculateViewerSize(window, &sb))
 	}()
 
-	window.ShowAndRun()
+	window.Show()
+	app.Run()
 
 	return nil
 }
