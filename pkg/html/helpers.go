@@ -78,12 +78,17 @@ func extractSections(root *html.Node) ([]Section, error) {
 }
 
 func extractPageHeader(root *html.Node) (string, error) {
-	titleTags, err := querySelect(root, "h1")
+	mains, err := querySelect(root, "main")
 	if err != nil {
 		return "", fmt.Errorf("selecting title: %w", err)
 	}
 
-	return titleTags[0].FirstChild.Data, nil
+	headers, err := querySelect(mains[0], "h1")
+	if err != nil {
+		return "", fmt.Errorf("selecting headers: %w", err)
+	}
+
+	return headers[0].FirstChild.Data, nil
 }
 
 func extractParagraphs(parent *html.Node) ([]string, error) {
