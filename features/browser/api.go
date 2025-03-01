@@ -14,11 +14,9 @@ import (
 
 func Start(url string) error {
 	app := app.New()
-
-	// Setup containers
 	window := app.NewWindow("main")
 
-	setupUIOld(window)
+	setupUI(window)
 
 	app.Run()
 
@@ -78,4 +76,50 @@ func setupUIOld(window fyne.Window) {
 	}()
 
 	window.Show()
+}
+
+func setupUI(window fyne.Window) {
+	ui := &ui{
+		statusbar: NewStatusBar(),
+		viewport:  container.NewVBox(),
+		navbar:    NewNavbar(),
+	}
+
+	ui.viewer = viewer.New(func() float32 {
+		return window.Canvas().Size().Height - ui.statusbar.CanvasObject().Size().Height
+	})
+
+	ui.content = container.NewHSplit(ui.navbar.CanvasObject(), ui.viewer.CanvasObject())
+	ui.content.SetOffset(.2)
+
+	viewport := container.NewVBox(ui.statusbar.CanvasObject(), ui.content)
+
+	go func() {
+		ui.statusbar.SetAddress("mock URL")
+		parsedPage, err := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
+		if err != nil {
+			return
+		}
+
+		page := asPage(parsedPage)
+
+		ui.navbar.SetLinks(page.navigation)
+
+		ui.viewer.SetPageTitle(page.Title)
+		ui.viewer.SetSections(asViewerSections(page.Sections))
+		ui.viewer.Refresh()
+	}()
+
+	window.SetContent(viewport)
+	window.Show()
+}
+
+type ui struct {
+	statusbar statusbar
+
+	viewport *fyne.Container
+	content  *container.Split
+
+	navbar navbar
+	viewer viewer.Viewer
 }
