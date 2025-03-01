@@ -1,6 +1,6 @@
-package browser
+package mockdata
 
 import _ "embed"
 
 //go:embed mockdata.html
-var mockData string
+var MockRawWebpage string

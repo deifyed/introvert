@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 
 	html_utils "github.com/deifyed/introvert/pkg/html"
+	"github.com/deifyed/introvert/pkg/mockdata"
 )
 
 func Start(url string) error {
@@ -34,11 +35,11 @@ func Start(url string) error {
 
 	viewport.Add(main)
 
-	window := app.NewWindow("main")
-	window.SetContent(viewport)
+	window.SetContent(container.NewPadded(viewport))
 
 	go func() {
-		parsedPage, err := html_utils.Parse(strings.NewReader(mockData))
+		sb.SetAddress(url)
+		parsedPage, err := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
 		if err != nil {
 			notify(app, err.Error())
 
