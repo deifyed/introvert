@@ -7,7 +7,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
 
 	html_utils "github.com/deifyed/introvert/pkg/html"
 	"github.com/deifyed/introvert/pkg/mockdata"
@@ -16,26 +15,27 @@ import (
 func Start(url string) error {
 	app := app.New()
 
-	viewport := container.New(layout.NewVBoxLayout())
-
-	sb := NewStatusBar()
-	sb.SetAddress(url)
-	viewport.Add(sb.CanvasObject())
-
+	// Setup containers
+	window := app.NewWindow("main")
+	viewport := container.NewVBox()
 	main := container.NewHBox()
 
+	// Setup parts
 	navbar := NewNavbar()
-	main.Add(navbar.CanvasObject())
+	sb := NewStatusBar()
 
 	viewer := NewViewer()
-
 	viewerScroll := container.NewScroll(viewer.CanvasObject())
 
+	// Bind main
+	main.Add(navbar.CanvasObject())
 	main.Add(viewerScroll)
 
+	// Bind viewport
+	viewport.Add(sb.CanvasObject())
 	viewport.Add(main)
 
-	window.SetContent(container.NewPadded(viewport))
+	window.SetContent(viewport)
 
 	go func() {
 		sb.SetAddress(url)
