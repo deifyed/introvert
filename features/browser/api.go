@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 
+	"github.com/deifyed/introvert/pkg/components/statusbar"
 	"github.com/deifyed/introvert/pkg/components/viewer"
 	html_utils "github.com/deifyed/introvert/pkg/html"
 	"github.com/deifyed/introvert/pkg/mockdata"
@@ -38,7 +39,7 @@ func asViewerSections(originalSections []section) []viewer.Section {
 
 func setupUI(window fyne.Window) {
 	ui := &ui{
-		statusbar: NewStatusBar(),
+		statusbar: statusbar.New(),
 		viewport:  container.NewVBox(),
 		navbar:    NewNavbar(),
 	}
@@ -61,7 +62,7 @@ func setupUI(window fyne.Window) {
 }
 
 type ui struct {
-	statusbar statusbar
+	statusbar statusbar.Statusbar
 
 	viewport *fyne.Container
 	content  *container.Split

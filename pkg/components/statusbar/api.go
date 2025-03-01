@@ -1,4 +1,4 @@
-package browser
+package statusbar
 
 import (
 	"fyne.io/fyne/v2"
@@ -6,32 +6,27 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-type statusbar struct {
-	container  *fyne.Container
-	txtAddress *widget.Entry
-}
-
-func NewStatusBar() statusbar {
+func New() Statusbar {
 	frame := container.NewHBox()
 
 	txtAddress := widget.NewEntry()
 
 	frame.Add(txtAddress)
 
-	return statusbar{
+	return Statusbar{
 		container:  frame,
 		txtAddress: txtAddress,
 	}
 }
 
-func (this *statusbar) CanvasObject() fyne.CanvasObject {
+func (this *Statusbar) CanvasObject() fyne.CanvasObject {
 	return this.container
 }
 
-func (this *statusbar) SetAddress(url string) {
+func (this *Statusbar) SetAddress(url string) {
 	this.txtAddress.SetText(url)
 }
 
-func (this *statusbar) SetOnSubmitListener(fn func(string)) {
+func (this *Statusbar) SetOnSubmitListener(fn func(string)) {
 	this.txtAddress.OnSubmitted = fn
 }
