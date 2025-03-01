@@ -1,7 +1,6 @@
 package browser
 
 import (
-	"fmt"
 	"strings"
 
 	"fyne.io/fyne/v2/app"
@@ -46,13 +45,13 @@ func Start(url string) error {
 			return
 		}
 
-		fmt.Println("no error")
-
 		page := asPage(parsedPage)
 
-		window.SetTitle(page.Title)
 		navbar.SetLinks(page.navigation)
+
+		viewer.SetPageTitle(page.Title)
 		viewer.SetSections(page.Sections)
+		viewer.Refresh()
 	}()
 
 	window.Show()
