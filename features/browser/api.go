@@ -3,6 +3,7 @@ package browser
 import (
 	"strings"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 
@@ -16,6 +17,28 @@ func Start(url string) error {
 
 	// Setup containers
 	window := app.NewWindow("main")
+
+	setupUIOld(window)
+
+	app.Run()
+
+	return nil
+}
+
+func asViewerSections(originalSections []section) []viewer.Section {
+	result := make([]viewer.Section, len(originalSections))
+
+	for index, s := range originalSections {
+		result[index] = viewer.Section{
+			Title:      s.header,
+			Paragraphs: s.paragraphs,
+		}
+	}
+
+	return result
+}
+
+func setupUIOld(window fyne.Window) {
 	viewport := container.NewVBox()
 	main := container.NewHBox()
 
@@ -39,11 +62,9 @@ func Start(url string) error {
 	window.SetContent(viewport)
 
 	go func() {
-		sb.SetAddress(url)
+		sb.SetAddress("mock URL")
 		parsedPage, err := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
 		if err != nil {
-			notify(app, err.Error())
-
 			return
 		}
 
@@ -57,20 +78,4 @@ func Start(url string) error {
 	}()
 
 	window.Show()
-	app.Run()
-
-	return nil
-}
-
-func asViewerSections(originalSections []section) []viewer.Section {
-	result := make([]viewer.Section, len(originalSections))
-
-	for index, s := range originalSections {
-		result[index] = viewer.Section{
-			Title:      s.header,
-			Paragraphs: s.paragraphs,
-		}
-	}
-
-	return result
 }
