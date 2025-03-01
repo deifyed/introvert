@@ -1,10 +1,9 @@
-package html_test
+package html
 
 import (
 	"strings"
 	"testing"
 
-	api "github.com/deifyed/introvert/pkg/html"
 	"golang.org/x/net/html"
 )
 
@@ -39,7 +38,7 @@ func TestQuerySelectForItems(t *testing.T) {
 				t.Fatal("parsing document")
 			}
 
-			result, err := api.QuerySelect(document, testCase.withQuery)
+			result, err := querySelect(document, testCase.withQuery)
 			if err != nil {
 				t.Fatalf("selecting: %s", err.Error())
 			}
@@ -82,7 +81,7 @@ func TestQuerySelectForData(t *testing.T) {
 				t.Fatal("parsing document")
 			}
 
-			result, err := api.QuerySelect(document, testCase.withQuery)
+			result, err := querySelect(document, testCase.withQuery)
 			if err != nil {
 				t.Fatalf("selecting: %s", err.Error())
 			}

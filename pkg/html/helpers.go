@@ -7,8 +7,8 @@ import (
 	"golang.org/x/net/html"
 )
 
-// QuerySelect searches for all nodes with the given tag name in the HTML tree.
-func QuerySelect(root *html.Node, query string) ([]*html.Node, error) {
+// querySelect searches for all nodes with the given tag name in the HTML tree.
+func querySelect(root *html.Node, query string) ([]*html.Node, error) {
 	// Traverse the HTML tree recursively to find all matching tags
 	var traverse func(*html.Node) []*html.Node
 
@@ -38,7 +38,7 @@ func QuerySelect(root *html.Node, query string) ([]*html.Node, error) {
 }
 
 func extractNavigation(root *html.Node) ([]Link, error) {
-	anchorTags, err := QuerySelect(root, "a")
+	anchorTags, err := querySelect(root, "a")
 	if err != nil {
 		return nil, fmt.Errorf("selecting anchors: %w", err)
 	}
@@ -56,7 +56,7 @@ func extractNavigation(root *html.Node) ([]Link, error) {
 }
 
 func extractSections(root *html.Node) ([]Section, error) {
-	sectionTags, err := QuerySelect(root, "section")
+	sectionTags, err := querySelect(root, "section")
 	if err != nil {
 		return nil, fmt.Errorf("querying <section>'s: %w", err)
 	}
@@ -78,7 +78,7 @@ func extractSections(root *html.Node) ([]Section, error) {
 }
 
 func extractPageHeader(root *html.Node) (string, error) {
-	titleTags, err := QuerySelect(root, "h1")
+	titleTags, err := querySelect(root, "h1")
 	if err != nil {
 		return "", fmt.Errorf("selecting title: %w", err)
 	}
@@ -87,7 +87,7 @@ func extractPageHeader(root *html.Node) (string, error) {
 }
 
 func extractParagraphs(parent *html.Node) ([]string, error) {
-	pTags, err := QuerySelect(parent, "p")
+	pTags, err := querySelect(parent, "p")
 	if err != nil {
 		return nil, fmt.Errorf("querying <p>'s: %w", err)
 	}
