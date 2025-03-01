@@ -96,18 +96,10 @@ func setupUI(window fyne.Window) {
 
 	go func() {
 		ui.statusbar.SetAddress("mock URL")
-		parsedPage, err := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
-		if err != nil {
-			return
-		}
 
-		page := asPage(parsedPage)
+		parsedPage, _ := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
 
-		ui.navbar.SetLinks(page.navigation)
-
-		ui.viewer.SetPageTitle(page.Title)
-		ui.viewer.SetSections(asViewerSections(page.Sections))
-		ui.viewer.Refresh()
+		ui.Open(asPage(parsedPage))
 	}()
 
 	window.SetContent(viewport)
@@ -122,4 +114,12 @@ type ui struct {
 
 	navbar navbar
 	viewer viewer.Viewer
+}
+
+func (this *ui) Open(page page) {
+	this.navbar.SetLinks(page.navigation)
+
+	this.viewer.SetPageTitle(page.Title)
+	this.viewer.SetSections(asViewerSections(page.Sections))
+	this.viewer.Refresh()
 }
