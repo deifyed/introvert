@@ -14,5 +14,4 @@ type page struct {
 	Title      string
 	navigation []link
 	Sections   []section
-	Content    string
 }
