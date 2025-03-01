@@ -2,11 +2,9 @@ package browser
 
 import (
 	"fmt"
-	"io"
 
 	html_utils "github.com/deifyed/introvert/pkg/html"
 	http_utils "github.com/deifyed/introvert/pkg/http"
-	"golang.org/x/net/html"
 )
 
 func loadURL(url string) (page, error) {
@@ -15,102 +13,44 @@ func loadURL(url string) (page, error) {
 		return page{}, fmt.Errorf("opening page: %w", err)
 	}
 
-	parsedPage, err := parse(raw)
+	parsedPage, err := html_utils.Parse(raw)
 	if err != nil {
 		return page{}, fmt.Errorf("parsing body: %w", err)
 	}
 
-	return parsedPage, nil
+	return asPage(parsedPage), nil
 }
 
-func makeHeader(root *html.Node) (string, error) {
-	titleTags, err := html_utils.QuerySelect(root, "h1")
-	if err != nil {
-		return "", fmt.Errorf("selecting title: %w", err)
-	}
+func asLinks(links []html_utils.Link) []link {
+	result := make([]link, len(links))
 
-	return titleTags[0].FirstChild.Data, nil
-}
-
-func makeNavigation(root *html.Node) ([]link, error) {
-	anchorTags, err := html_utils.QuerySelect(root, "a")
-	if err != nil {
-		return nil, fmt.Errorf("selecting anchors: %w", err)
-	}
-
-	links := make([]link, len(anchorTags))
-	for index, a := range anchorTags {
-		title := a.FirstChild.Data
-
-		links[index] = link{
-			title: title,
+	for index, item := range links {
+		result[index] = link{
+			title:   item.Title,
+			address: item.Address,
 		}
 	}
 
-	return links, nil
+	return result
 }
 
-func extractParagraphs(parent *html.Node) ([]string, error) {
-	pTags, err := html_utils.QuerySelect(parent, "p")
-	if err != nil {
-		return nil, fmt.Errorf("querying <p>'s: %w", err)
-	}
+func asSections(sections []html_utils.Section) []section {
+	result := make([]section, len(sections))
 
-	paragraphs := make([]string, len(pTags))
-
-	for index, node := range pTags {
-		paragraphs[index] = node.FirstChild.Data
-	}
-
-	return paragraphs, nil
-}
-
-func makeSections(root *html.Node) ([]section, error) {
-	sectionTags, err := html_utils.QuerySelect(root, "section")
-	if err != nil {
-		return nil, fmt.Errorf("querying <section>'s: %w", err)
-	}
-
-	sections := make([]section, len(sectionTags))
-	for index, tag := range sectionTags {
-		paragraphs, err := extractParagraphs(tag)
-		if err != nil {
-			return nil, fmt.Errorf("extracting paragraphs: %w", err)
-		}
-
-		sections[index] = section{
-			header:     tag.FirstChild.Data,
-			paragraphs: paragraphs,
+	for index, item := range sections {
+		result[index] = section{
+			header:     item.Header,
+			paragraphs: item.Paragraphs,
 		}
 	}
 
-	return sections, nil
+	return result
 }
 
-func parse(in io.Reader) (page, error) {
-	root, err := html.Parse(in)
-	if err != nil {
-		return page{}, fmt.Errorf("parsing: %w", err)
-	}
-
-	header, err := makeHeader(root)
-	if err != nil {
-		return page{}, fmt.Errorf("making header: %w", err)
-	}
-
-	navigation, err := makeNavigation(root)
-	if err != nil {
-		return page{}, fmt.Errorf("making navigation: %w", err)
-	}
-
-	sections, err := makeSections(root)
-	if err != nil {
-		return page{}, fmt.Errorf("making sections: %w", err)
-	}
-
+func asPage(p html_utils.Page) page {
 	return page{
-		Title:      header,
-		Sections:   sections,
-		navigation: navigation,
-	}, nil
+		Title:      p.Title,
+		navigation: asLinks(p.Navigation),
+		Sections:   asSections(p.Sections),
+	}
 }

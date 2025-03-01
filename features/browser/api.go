@@ -1,12 +1,15 @@
 package browser
 
 import (
+	"fmt"
 	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+
+	html_utils "github.com/deifyed/introvert/pkg/html"
 )
 
 func Start(url string) error {
@@ -35,12 +38,16 @@ func Start(url string) error {
 	window.SetContent(viewport)
 
 	go func() {
-		page, err := parse(strings.NewReader(mockData))
+		parsedPage, err := html_utils.Parse(strings.NewReader(mockData))
 		if err != nil {
 			notify(app, err.Error())
 
 			return
 		}
+
+		fmt.Println("no error")
+
+		page := asPage(parsedPage)
 
 		window.SetTitle(page.Title)
 		navbar.SetLinks(page.navigation)
