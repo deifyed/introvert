@@ -6,20 +6,33 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func NewViewer() viewer {
+type heightGetter func() float32
+
+func NewViewer(getAvailableHeight heightGetter) viewer {
 	c := container.NewVBox()
+	scroll := container.NewScroll(c)
 
 	return viewer{
-		container: c,
+		container:          c,
+		scroll:             scroll,
+		getAvailableHeight: getAvailableHeight,
 	}
 }
 
 type viewer struct {
-	container *fyne.Container
+	container          *fyne.Container
+	scroll             *container.Scroll
+	getAvailableHeight heightGetter
+}
+
+func (this *viewer) refreshSize() {
+	size := fyne.NewSize(500, this.getAvailableHeight())
+
+	this.scroll.SetMinSize(size)
 }
 
 func (this *viewer) CanvasObject() fyne.CanvasObject {
-	return this.container
+	return this.scroll
 }
 
 func (this *viewer) SetSections(sections []section) {
@@ -28,6 +41,8 @@ func (this *viewer) SetSections(sections []section) {
 	for _, s := range sections {
 		this.container.Add(makeSection(s))
 	}
+
+	this.refreshSize()
 }
 
 func makeSection(s section) fyne.CanvasObject {

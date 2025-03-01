@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 
@@ -24,12 +23,13 @@ func Start(url string) error {
 	navbar := NewNavbar()
 	sb := NewStatusBar()
 
-	viewer := NewViewer()
-	viewerScroll := container.NewScroll(viewer.CanvasObject())
+	viewer := NewViewer(func() float32 {
+		return window.Canvas().Size().Height - sb.CanvasObject().Size().Height
+	})
 
 	// Bind main
 	main.Add(navbar.CanvasObject())
-	main.Add(viewerScroll)
+	main.Add(viewer.CanvasObject())
 
 	// Bind viewport
 	viewport.Add(sb.CanvasObject())
@@ -53,18 +53,10 @@ func Start(url string) error {
 		window.SetTitle(page.Title)
 		navbar.SetLinks(page.navigation)
 		viewer.SetSections(page.Sections)
-		viewerScroll.SetMinSize(calculateViewerSize(window, &sb))
 	}()
 
 	window.Show()
 	app.Run()
 
 	return nil
-}
-
-func calculateViewerSize(window fyne.Window, sb *statusbar) fyne.Size {
-	var width float32 = 500
-	var height float32 = window.Canvas().Size().Height - sb.CanvasObject().Size().Height
-
-	return fyne.NewSize(width, height)
 }
