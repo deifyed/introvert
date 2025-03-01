@@ -8,18 +8,19 @@ import (
 
 type statusbar struct {
 	container  *fyne.Container
-	lblAddress *widget.Label
+	txtAddress *widget.Entry
 }
 
 func NewStatusBar() statusbar {
 	frame := container.NewHBox()
 
-	lblAddress := widget.NewLabel("loading")
-	frame.Add(lblAddress)
+	txtAddress := widget.NewEntry()
+
+	frame.Add(txtAddress)
 
 	return statusbar{
 		container:  frame,
-		lblAddress: lblAddress,
+		txtAddress: txtAddress,
 	}
 }
 
@@ -28,5 +29,9 @@ func (this *statusbar) CanvasObject() fyne.CanvasObject {
 }
 
 func (this *statusbar) SetAddress(url string) {
-	this.lblAddress.SetText(url)
+	this.txtAddress.SetText(url)
+}
+
+func (this *statusbar) SetOnSubmitListener(fn func(string)) {
+	this.txtAddress.OnSubmitted = fn
 }

@@ -36,48 +36,6 @@ func asViewerSections(originalSections []section) []viewer.Section {
 	return result
 }
 
-func setupUIOld(window fyne.Window) {
-	viewport := container.NewVBox()
-	main := container.NewHBox()
-
-	// Setup parts
-	navbar := NewNavbar()
-	sb := NewStatusBar()
-
-	viewer := viewer.New(func() float32 {
-		return window.Canvas().Size().Height - sb.CanvasObject().Size().Height
-	})
-
-	// Bind main
-	main.Add(navbar.CanvasObject())
-	main.Add(viewer.CanvasObject())
-
-	// Bind viewport
-	viewport.Add(sb.CanvasObject())
-	viewport.Add(main)
-
-	// Bind window
-	window.SetContent(viewport)
-
-	go func() {
-		sb.SetAddress("mock URL")
-		parsedPage, err := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
-		if err != nil {
-			return
-		}
-
-		page := asPage(parsedPage)
-
-		navbar.SetLinks(page.navigation)
-
-		viewer.SetPageTitle(page.Title)
-		viewer.SetSections(asViewerSections(page.Sections))
-		viewer.Refresh()
-	}()
-
-	window.Show()
-}
-
 func setupUI(window fyne.Window) {
 	ui := &ui{
 		statusbar: NewStatusBar(),
@@ -94,13 +52,9 @@ func setupUI(window fyne.Window) {
 
 	viewport := container.NewVBox(ui.statusbar.CanvasObject(), ui.content)
 
-	go func() {
-		ui.statusbar.SetAddress("mock URL")
-
-		parsedPage, _ := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
-
-		ui.Open(asPage(parsedPage))
-	}()
+	ui.statusbar.SetOnSubmitListener(func(address string) {
+		go ui.Navigate(address)
+	})
 
 	window.SetContent(viewport)
 	window.Show()
@@ -114,6 +68,17 @@ type ui struct {
 
 	navbar navbar
 	viewer viewer.Viewer
+}
+
+func (this *ui) Navigate(url string) {
+	this.statusbar.SetAddress(url)
+
+	page, err := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
+	if err != nil {
+		return
+	}
+
+	this.Open(asPage(page))
 }
 
 func (this *ui) Open(page page) {
