@@ -1,4 +1,4 @@
-package statusbar
+package toolbar
 
 import (
 	"fyne.io/fyne/v2"
@@ -6,7 +6,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func New() Statusbar {
+func New() Toolbar {
 	frame := container.NewBorder(nil, nil, nil, nil)
 
 	txtAddress := widget.NewEntry()
@@ -17,20 +17,20 @@ func New() Statusbar {
 
 	frame.Add(txtAddress)
 
-	return Statusbar{
+	return Toolbar{
 		container:  frame,
 		txtAddress: txtAddress,
 	}
 }
 
-func (this *Statusbar) CanvasObject() fyne.CanvasObject {
+func (this *Toolbar) CanvasObject() fyne.CanvasObject {
 	return this.container
 }
 
-func (this *Statusbar) SetAddress(url string) {
+func (this *Toolbar) SetAddress(url string) {
 	this.txtAddress.SetText(url)
 }
 
-func (this *Statusbar) SetOnSubmitListener(fn func(string)) {
+func (this *Toolbar) SetOnSubmitListener(fn func(string)) {
 	this.txtAddress.OnSubmitted = fn
 }

@@ -7,7 +7,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"github.com/deifyed/introvert/pkg/components/statusbar"
+	"github.com/deifyed/introvert/pkg/components/toolbar"
 	"github.com/deifyed/introvert/pkg/components/viewer"
 	html_utils "github.com/deifyed/introvert/pkg/html"
 	"github.com/deifyed/introvert/pkg/mockdata"
@@ -20,7 +20,7 @@ const (
 )
 
 type ui struct {
-	statusbar statusbar.Statusbar
+	toolbar toolbar.Toolbar
 
 	viewport *fyne.Container
 	content  *fyne.Container
@@ -41,18 +41,18 @@ func (this *ui) Open(page page) {
 
 func newUI(window fyne.Window, url string) *ui {
 	ui := &ui{
-		statusbar: statusbar.New(),
-		content:   container.NewBorder(nil, nil, nil, nil),
-		navbar:    NewNavbar(),
+		toolbar: toolbar.New(),
+		content: container.NewBorder(nil, nil, nil, nil),
+		navbar:  NewNavbar(),
 	}
 
 	ui.viewer = viewer.New(func() float32 {
-		return window.Canvas().Size().Height - ui.statusbar.CanvasObject().Size().Height
+		return window.Canvas().Size().Height - ui.toolbar.CanvasObject().Size().Height
 	})
 
-	ui.viewport = container.NewVBox(ui.statusbar.CanvasObject(), ui.content)
+	ui.viewport = container.NewVBox(ui.toolbar.CanvasObject(), ui.content)
 
-	ui.statusbar.SetOnSubmitListener(func(address string) {
+	ui.toolbar.SetOnSubmitListener(func(address string) {
 		go ui.Navigate(address)
 	})
 
@@ -69,7 +69,7 @@ func newUI(window fyne.Window, url string) *ui {
 }
 
 func (this *ui) Navigate(url string) {
-	this.statusbar.SetAddress(url)
+	this.toolbar.SetAddress(url)
 
 	this.showLoading()
 
