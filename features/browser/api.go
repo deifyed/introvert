@@ -10,7 +10,7 @@ func Start(url string) error {
 	app := app.New()
 	window := app.NewWindow("main")
 
-	newUI(window)
+	newUI(window, url)
 
 	app.Run()
 

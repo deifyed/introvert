@@ -23,9 +23,15 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	Args: cobra.ExactArgs(1),
+	Args: cobra.RangeArgs(0, 1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return browser.Start(args[0])
+		targetURL := ""
+
+		if len(args) != 0 {
+			targetURL = args[0]
+		}
+
+		return browser.Start(targetURL)
 	},
 }
 

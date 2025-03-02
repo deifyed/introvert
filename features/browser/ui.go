@@ -39,7 +39,7 @@ func (this *ui) Open(page page) {
 	this.viewer.Refresh()
 }
 
-func newUI(window fyne.Window) *ui {
+func newUI(window fyne.Window, url string) *ui {
 	ui := &ui{
 		statusbar: statusbar.New(),
 		content:   container.NewBorder(nil, nil, nil, nil),
@@ -56,10 +56,14 @@ func newUI(window fyne.Window) *ui {
 		go ui.Navigate(address)
 	})
 
-	ui.ShowEmptyScreen()
+	ui.showEmptyScreen()
 
 	window.SetContent(ui.viewport)
 	window.Show()
+
+	if url != "" {
+		go ui.Navigate(url)
+	}
 
 	return ui
 }
@@ -103,7 +107,7 @@ func (this *ui) showLoading() {
 	this.currentView = viewLoading
 }
 
-func (this *ui) ShowEmptyScreen() {
+func (this *ui) showEmptyScreen() {
 	this.content.RemoveAll()
 
 	label := widget.NewLabel("⭐")
