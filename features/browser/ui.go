@@ -2,23 +2,33 @@ package browser
 
 import (
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 	"github.com/deifyed/introvert/pkg/components/statusbar"
 	"github.com/deifyed/introvert/pkg/components/viewer"
 	html_utils "github.com/deifyed/introvert/pkg/html"
 	"github.com/deifyed/introvert/pkg/mockdata"
 )
 
+const (
+	viewEmpty = iota
+	viewLoading
+	viewContent
+)
+
 type ui struct {
 	statusbar statusbar.Statusbar
 
 	viewport *fyne.Container
-	content  *container.Split
+	content  *fyne.Container
 
 	navbar navbar
 	viewer viewer.Viewer
+
+	currentView int
 }
 
 func (this *ui) Open(page page) {
@@ -32,7 +42,7 @@ func (this *ui) Open(page page) {
 func newUI(window fyne.Window) *ui {
 	ui := &ui{
 		statusbar: statusbar.New(),
-		viewport:  container.NewVBox(),
+		content:   container.NewBorder(nil, nil, nil, nil),
 		navbar:    NewNavbar(),
 	}
 
@@ -40,16 +50,15 @@ func newUI(window fyne.Window) *ui {
 		return window.Canvas().Size().Height - ui.statusbar.CanvasObject().Size().Height
 	})
 
-	ui.content = container.NewHSplit(ui.navbar.CanvasObject(), ui.viewer.CanvasObject())
-	ui.content.SetOffset(.2)
-
-	viewport := container.NewVBox(ui.statusbar.CanvasObject(), ui.content)
+	ui.viewport = container.NewVBox(ui.statusbar.CanvasObject(), ui.content)
 
 	ui.statusbar.SetOnSubmitListener(func(address string) {
 		go ui.Navigate(address)
 	})
 
-	window.SetContent(viewport)
+	ui.ShowEmptyScreen()
+
+	window.SetContent(ui.viewport)
 	window.Show()
 
 	return ui
@@ -58,10 +67,49 @@ func newUI(window fyne.Window) *ui {
 func (this *ui) Navigate(url string) {
 	this.statusbar.SetAddress(url)
 
+	this.showLoading()
+
 	page, err := html_utils.Parse(strings.NewReader(mockdata.MockRawWebpage))
 	if err != nil {
 		return
 	}
 
+	time.Sleep(2 * time.Second)
+
+	this.showContent()
+
 	this.Open(asPage(page))
+}
+
+func (this *ui) showContent() {
+	this.content.RemoveAll()
+
+	splitter := container.NewHSplit(this.navbar.CanvasObject(), this.viewer.CanvasObject())
+	splitter.SetOffset(.2)
+
+	this.content.Add(splitter)
+
+	this.currentView = viewContent
+}
+
+func (this *ui) showLoading() {
+	this.content.RemoveAll()
+
+	pbLoading := widget.NewProgressBarInfinite()
+	pbLoading.Start()
+
+	this.content.Add(pbLoading)
+
+	this.currentView = viewLoading
+}
+
+func (this *ui) ShowEmptyScreen() {
+	this.content.RemoveAll()
+
+	label := widget.NewLabel("⭐")
+	label.Alignment = fyne.TextAlignCenter
+
+	this.content.Add(label)
+
+	this.currentView = viewEmpty
 }
