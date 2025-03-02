@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/deifyed/introvert/pkg/components/statusbar"
 	"github.com/deifyed/introvert/pkg/components/toolbar"
 	"github.com/deifyed/introvert/pkg/components/viewer"
 	html_utils "github.com/deifyed/introvert/pkg/html"
@@ -21,7 +22,8 @@ const (
 )
 
 type ui struct {
-	toolbar toolbar.Toolbar
+	toolbar   toolbar.Toolbar
+	statusbar statusbar.Statusbar
 
 	viewport *fyne.Container
 	content  *fyne.Container
@@ -42,9 +44,9 @@ func (this *ui) Open(page page) {
 
 func newUI(window fyne.Window, url string) *ui {
 	ui := &ui{
-		toolbar: toolbar.New(),
-		content: container.NewBorder(nil, nil, nil, nil),
-		navbar:  NewNavbar(),
+		toolbar:   toolbar.New(),
+		statusbar: statusbar.New(),
+		content:   container.NewBorder(nil, nil, nil, nil),
 	}
 
 	ui.navbar = NewNavbar(ui.Navigate)
@@ -53,7 +55,11 @@ func newUI(window fyne.Window, url string) *ui {
 		return window.Canvas().Size().Height - ui.toolbar.CanvasObject().Size().Height
 	})
 
-	ui.viewport = container.NewVBox(ui.toolbar.CanvasObject(), ui.content)
+	ui.viewport = container.NewVBox(
+		ui.toolbar.CanvasObject(),
+		ui.content,
+		ui.statusbar.CanvasObject(),
+	)
 
 	ui.toolbar.SetOnSubmitListener(func(address string) {
 		go ui.Navigate(ensureURL(address))
@@ -82,6 +88,7 @@ func (this *ui) Navigate(url string) {
 	}
 
 	time.Sleep(2 * time.Second)
+	this.statusbar.StopLoading()
 
 	this.showContent()
 
@@ -100,12 +107,7 @@ func (this *ui) showContent() {
 }
 
 func (this *ui) showLoading() {
-	this.content.RemoveAll()
-
-	pbLoading := widget.NewProgressBarInfinite()
-	pbLoading.Start()
-
-	this.content.Add(pbLoading)
+	this.statusbar.StartLoading()
 
 	this.currentView = viewLoading
 }
