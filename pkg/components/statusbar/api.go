@@ -7,9 +7,13 @@ import (
 )
 
 func New() Statusbar {
-	frame := container.NewHBox()
+	frame := container.NewBorder(nil, nil, nil, nil)
 
 	txtAddress := widget.NewEntry()
+	txtAddress.Scroll = container.ScrollNone
+	txtAddress.Wrapping = fyne.TextWrapOff
+
+	txtAddress.SetPlaceHolder("Enter address")
 
 	frame.Add(txtAddress)
 
