@@ -1,21 +1,23 @@
 package browser
 
 import (
-	"fmt"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
-func NewNavbar() navbar {
+type navigateListener func(string)
+
+func NewNavbar(onNavigate navigateListener) navbar {
 	return navbar{
-		container: container.NewVBox(),
+		container:  container.NewVBox(),
+		onNavigate: onNavigate,
 	}
 }
 
 type navbar struct {
-	container *fyne.Container
+	container  *fyne.Container
+	onNavigate navigateListener
 }
 
 func (this *navbar) CanvasObject() fyne.CanvasObject {
@@ -35,13 +37,9 @@ func (this *navbar) SetLinks(links []link) {
 
 	for _, l := range links {
 		btn := widget.NewButton(l.title, func() {
-			navigate(l.address)
+			this.onNavigate(l.address)
 		})
 
 		this.container.Add(btn)
 	}
-}
-
-func navigate(url string) {
-	fmt.Printf("Navigating to: %s\n", url)
 }

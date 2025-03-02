@@ -46,6 +46,8 @@ func newUI(window fyne.Window, url string) *ui {
 		navbar:  NewNavbar(),
 	}
 
+	ui.navbar = NewNavbar(ui.Navigate)
+
 	ui.viewer = viewer.New(func() float32 {
 		return window.Canvas().Size().Height - ui.toolbar.CanvasObject().Size().Height
 	})
