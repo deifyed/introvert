@@ -24,11 +24,9 @@ func New(getAvailableHeight heightGetter) Viewer {
 	lblPageTitle := widget.NewLabelWithStyle("", fyne.TextAlignLeading, pageHeaderStyle)
 	c.Add(lblPageTitle)
 
-	scroll := container.NewScroll(c)
-
 	return Viewer{
 		container:          c,
-		scroll:             scroll,
+		scroll:             container.NewScroll(c),
 		getAvailableHeight: getAvailableHeight,
 
 		lblPageTitle: lblPageTitle,
