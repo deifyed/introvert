@@ -1,6 +1,7 @@
 package browser
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -55,7 +56,7 @@ func newUI(window fyne.Window, url string) *ui {
 	ui.viewport = container.NewVBox(ui.toolbar.CanvasObject(), ui.content)
 
 	ui.toolbar.SetOnSubmitListener(func(address string) {
-		go ui.Navigate(address)
+		go ui.Navigate(ensureURL(address))
 	})
 
 	ui.showEmptyScreen()
@@ -118,4 +119,12 @@ func (this *ui) showEmptyScreen() {
 	this.content.Add(label)
 
 	this.currentView = viewEmpty
+}
+
+func ensureURL(rawURL string) string {
+	if len(strings.Split(rawURL, "https://")) == 1 {
+		return fmt.Sprintf("https://%s", rawURL)
+	}
+
+	return rawURL
 }
