@@ -13,10 +13,14 @@ func New() Statusbar {
 
 	frame.Add(pbLoading)
 
-	return Statusbar{
+	sb := Statusbar{
 		container: frame,
 		pbLoading: pbLoading,
 	}
+
+	sb.StopLoading()
+
+	return sb
 }
 
 func (this *Statusbar) CanvasObject() fyne.CanvasObject {
